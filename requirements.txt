@@ -1,4 +1,5 @@
 streamlit
 requests
 opencv-python-headless
-zbar
+pyzbar==0.1.7
+decode
