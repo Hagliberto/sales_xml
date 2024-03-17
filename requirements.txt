@@ -1,3 +1,4 @@
+setup.sh
 streamlit
 requests
 opencv-python-headless
