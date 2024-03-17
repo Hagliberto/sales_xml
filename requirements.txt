@@ -2,3 +2,4 @@ streamlit
 click
 pandas
 xmltodict
+xlsxwriter
