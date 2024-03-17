@@ -1,6 +1,5 @@
-setup.sh
 streamlit
 requests
 opencv-python-headless
-pyzbar==0.1.7
+zbarlight
 decode
