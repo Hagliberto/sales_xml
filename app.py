@@ -5,6 +5,9 @@ from pyzbar.pyzbar import decode
 import pandas as pd
 from bs4 import BeautifulSoup
 import webbrowser
+import base64
+from PIL import Image
+import io
 
 def read_qr_code(frame):
     # Converte o frame para escala de cinza
@@ -53,12 +56,13 @@ def extract_cte_data(html_content):
 
 def save_data_to_excel(data, filename):
     try:
-        df = pd.DataFrame.from_dict(data, orient='index', columns=['Valor'])
-        df.to_excel(filename)
-        return True
+        df = pd.DataFrame(data.items(), columns=['Campo', 'Valor'])
+        filepath = filename
+        df.to_excel(filepath, index=False)
+        return filepath
     except Exception as e:
         st.error(f"Erro ao salvar os dados: {str(e)}")
-        return False
+        return None
 
 def main():
     st.title("Leitor de QR Code em Nota Fiscal Eletrônica")
@@ -77,7 +81,7 @@ def main():
         if ret:
             # Exibe o frame na aplicação
             st.image(frame, channels="BGR")
-            
+
             # Verifica se foi possível ler o QR Code
             decoded_objects = read_qr_code(frame)
             if decoded_objects:
@@ -102,8 +106,10 @@ def main():
                             st.write(cte_data)
                             # Salva os dados em um arquivo Excel
                             filename = "dados_extraidos.xlsx"
-                            if save_data_to_excel(cte_data, filename):
-                                st.success(f"Dados salvos em {filename}.")
+                            filepath = save_data_to_excel(cte_data, filename)
+                            if filepath:
+                                st.success(f"Dados salvos em {filepath}.")
+                                st.markdown(get_binary_file_downloader_html(filepath), unsafe_allow_html=True)
                             else:
                                 st.error("Erro ao salvar os dados.")
                         else:
@@ -116,6 +122,14 @@ def main():
                 st.error("Nenhum QR Code encontrado na imagem.")
 
     cap.release()
+
+# Função auxiliar para gerar o link de download do arquivo
+def get_binary_file_downloader_html(bin_file, file_label='File'):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    bin_str = base64.b64encode(data).decode()
+    href = f'<a href="data:application/octet-stream;base64,{bin_str}" download="{bin_file}">{file_label}</a>'
+    return href
 
 if __name__ == "__main__":
     main()
