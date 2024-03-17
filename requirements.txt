@@ -3,3 +3,4 @@ click
 pandas
 xmltodict
 xlsxwriter
+opencv-python
